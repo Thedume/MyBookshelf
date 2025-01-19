@@ -8,10 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.wsp.mybookshelf.domain.user.entity.UserGenre;
 import org.wsp.mybookshelf.global.commonEntity.enums.Gender;
 import org.wsp.mybookshelf.global.commonEntity.enums.Genre;
-import org.wsp.mybookshelf.global.commonEntity.enums.Status;
 
 import java.time.LocalDate;
 import java.util.List;

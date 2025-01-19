@@ -1,7 +1,6 @@
 package org.wsp.mybookshelf.domain.user.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.wsp.mybookshelf.global.commonEntity.enums.Genre;
 

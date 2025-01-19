@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.wsp.mybookshelf.domain.user.entity.UserGenre;
-
-import java.util.List;
 
 @Getter
 @NoArgsConstructor

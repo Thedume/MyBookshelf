@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.wsp.mybookshelf.global.commonEntity.enums.Gender;
-import org.wsp.mybookshelf.global.commonEntity.enums.Genre;
 import org.wsp.mybookshelf.global.commonEntity.enums.Status;
 
 import java.time.LocalDate;
