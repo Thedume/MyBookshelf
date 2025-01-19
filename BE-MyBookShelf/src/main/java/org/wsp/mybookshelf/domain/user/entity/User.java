@@ -1,12 +1,16 @@
 package org.wsp.mybookshelf.domain.user.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.wsp.mybookshelf.global.commonEntity.enums.Gender;
+import org.wsp.mybookshelf.global.commonEntity.enums.Status;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "User")
@@ -18,28 +22,48 @@ import java.util.Date;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
-    private String userId;
+    private Long userId;
 
-    @Column(name = "username")
-    private String userName;
-
-    @Column(name = "password")
+    @NotBlank(message = "비밀번호는 필수입니다.")
+    @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email")
+    @Email(message = "유효한 이메일 형식이 아닙니다.")
+    @NotBlank(message = "이메일은 필수입니다.")
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Column(name = "realname")
     private String realName;
 
-    @Column(name = "nickname")
+    @NotBlank(message = "닉네임은 필수입니다.")
+    @Column(name = "nickname", unique = true, nullable = false)
     private String nickName;
 
-    @Column(name = "created_at")
-    private Date createdAt;
+    @Column(name = "birthdate")
+    private LocalDate birthDate;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserGenre> userGenre = new ArrayList<>(); // 여러 장르를 관리
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDate createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status; // 사용자 상태
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now(); // 생성일 자동 설정
+        this.status = Status.ACTIVE; // 기본 상태를 활성으로 설정
+    }
 }
+
