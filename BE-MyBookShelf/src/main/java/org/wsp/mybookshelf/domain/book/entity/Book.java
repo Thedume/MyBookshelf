@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package org.wsp.mybookshelf.domain.book.entity;
 
 import jakarta.persistence.*;
@@ -48,3 +49,58 @@ public class Book {
     @Column(name = "page")
     private Integer page;
 }
+=======
+package org.wsp.mybookshelf.domain.book.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
+
+import java.util.Date;
+
+@Entity
+@Table(name = "Book")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Book {
+
+    @Id
+    @Column(name = "book_id", nullable = false)
+    private String bookId;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "author")
+    private String author;
+
+    @Column(name = "publisher")
+    private String publisher;
+
+    @Column(name = "published_date")
+    private Date publishedDate;
+
+    @Column(name = "isbn")
+    private String isbn;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "thumbnail")
+    private String thumbnail;
+
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "page")
+    private Integer page;
+}
+>>>>>>> ef4d9322cabfa11199b9fee8d65e5f14f3839b59
