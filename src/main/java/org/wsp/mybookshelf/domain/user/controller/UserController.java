@@ -3,7 +3,6 @@ package org.wsp.mybookshelf.domain.user.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import org.wsp.mybookshelf.domain.user.dto.UserRequestDTO;
 import org.wsp.mybookshelf.domain.user.dto.UserResponseDTO;
 import org.wsp.mybookshelf.domain.user.entity.User;
 import org.wsp.mybookshelf.domain.user.service.UserService;
-import org.wsp.mybookshelf.global.email.EmailRequest;
 import org.wsp.mybookshelf.global.response.ApiResponse;
 
 
@@ -27,16 +25,26 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponseDTO>> registerUser(
             @Valid @RequestBody UserRequestDTO.RegisterRequestDTO requestDTO, HttpSession session) {
         try {
+
+            // 비밀번호 일치 여부 확인
+            if (!requestDTO.getPassword().equals(requestDTO.getRepassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.onFailure("400", "비밀번호가 일치하지 않습니다."));
+            }
+
+            /*
             // 인증 상태 확인
             Boolean isVerified = (Boolean) session.getAttribute("isVerified");
             if (isVerified == null || !isVerified) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(ApiResponse.onFailure("400", "이메일 인증이 필요합니다."));
-            }
+            }*/
 
             // 사용자 등록 전에 중복 검사
             userService.isEmailDuplicate(requestDTO.getEmail());
             userService.isNickNameDuplicate(requestDTO.getNickname());
+
+
 
             // 사용자 등록
             User savedUser = userService.registerUser(requestDTO);
@@ -47,7 +55,6 @@ public class UserController {
                     .email(savedUser.getEmail())
                     .realname(savedUser.getRealName()) // realName으로 수정
                     .nickname(savedUser.getNickName())
-                    .genre(savedUser.getGenre()) // 수정된 부분
                     .build();
 
             // 세션에서 인증 정보 제거
@@ -65,9 +72,6 @@ public class UserController {
                     .body(ApiResponse.onFailure("500", e.getMessage()));
         }
     }
-
-
-
 
     //로그인
     @PostMapping("/login")
@@ -100,6 +104,7 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.onSuccess("로그아웃 성공"));
     }
 
+    //이메일 중복 확인
     @GetMapping("/check-email")
     public ResponseEntity<ApiResponse<String>> checkEmail(@RequestParam String email) {
         try {

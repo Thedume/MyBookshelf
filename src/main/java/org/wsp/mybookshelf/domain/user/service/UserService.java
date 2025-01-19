@@ -6,10 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wsp.mybookshelf.domain.user.dto.UserRequestDTO;
 import org.wsp.mybookshelf.domain.user.dto.UserResponseDTO;
 import org.wsp.mybookshelf.domain.user.entity.User;
+import org.wsp.mybookshelf.domain.user.entity.UserGenre;
 import org.wsp.mybookshelf.domain.user.repository.UserRepository;
+import org.wsp.mybookshelf.global.commonEntity.enums.Genre;
 import org.wsp.mybookshelf.global.commonEntity.enums.Status;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +32,18 @@ public class UserService {
                 .password(requestDTO.getPassword()) // 단순 저장 (암호화 필요)
                 .birthDate(requestDTO.getBirthDate())
                 .gender(requestDTO.getGender())
-                .genre(requestDTO.getGenre())
                 .status(Status.ACTIVE) // 가입 시 상태를 ACTIVE로 설정
                 .build();
+
+        // 장르 설정
+        List<UserGenre> userGenres = requestDTO.getGenre().stream()
+                .map(genre -> UserGenre.builder()
+                        .genre(genre) // Genre 필드 설정
+                        .user(newUser) // User 설정
+                        .build())
+                .collect(Collectors.toList());
+
+        newUser.setUserGenre(userGenres); // UserGenre를 User에 설정
 
         return userRepository.save(newUser);
     }
@@ -52,7 +65,6 @@ public class UserService {
                 .email(user.getEmail())
                 .realname(user.getRealName())
                 .nickname(user.getNickName())
-                .genre(user.getGenre())
                 .build();
     }
 

@@ -51,11 +51,8 @@ public class User {
     @Column(name = "gender")
     private Gender gender;
 
-    @ElementCollection(targetClass = Genre.class)
-    @CollectionTable(name = "user_genre", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "genre")
-    private List<Genre> genre = new ArrayList<>(); // 여러 장르를 저장
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserGenre> userGenre = new ArrayList<>(); // 여러 장르를 관리
 
     @Column(name = "created_at", updatable = false)
     private LocalDate createdAt;
@@ -70,3 +67,4 @@ public class User {
         this.status = Status.ACTIVE; // 기본 상태를 활성으로 설정
     }
 }
+

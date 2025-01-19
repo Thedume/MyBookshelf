@@ -27,3 +27,4 @@ public class UserGenre {
     @Column(name = "genre", nullable = false)
     private Genre genre;
 }
+

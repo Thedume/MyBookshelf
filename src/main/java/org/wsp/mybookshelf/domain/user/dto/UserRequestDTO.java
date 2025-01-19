@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.wsp.mybookshelf.domain.user.entity.UserGenre;
 import org.wsp.mybookshelf.global.commonEntity.enums.Gender;
 import org.wsp.mybookshelf.global.commonEntity.enums.Genre;
 import org.wsp.mybookshelf.global.commonEntity.enums.Status;
@@ -70,6 +71,9 @@ public class UserRequestDTO {
         @NotBlank
         @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.") // 비밀번호 길이 체크
         private String password;
+
+        @NotBlank(message = "비밀번호를 다시 한번 입력해주세요")
+        private String repassword;
 
         @NotNull(message = "생년월일은 필수입니다.")
         private LocalDate birthDate;

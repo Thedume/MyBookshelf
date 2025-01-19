@@ -42,7 +42,7 @@ public class EmailController {
         }
     }
 
-
+    //인증번호 검증
     @GetMapping("/verify-code")
     public ResponseEntity<ApiResponse<String>> verifyCode(@RequestParam(required = false) Integer inputCode, HttpSession session) {
         // 입력값이 없는 경우
