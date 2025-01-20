@@ -62,6 +62,7 @@
             :type="passwordConfirmVisible ? 'text' : 'password'"
             id="passwordConfirm"
             v-model="passwordConfirm"
+            :class="{ 'input-error': isPasswordMismatch }"
             placeholder="비밀번호 확인 입력"
             required
           />
@@ -69,18 +70,24 @@
             {{ passwordConfirmVisible ? '👁️' : '👁️‍🗨️' }}
           </span>
         </div>
+        <span v-if="isPasswordMismatch" style="color: red;">비밀번호가 일치하지 않습니다.</span>
       </div>
+
 
       <!-- 이름 -->
       <div class="form-group">
-        <label for="name">이름</label>
-        <input type="text" id="name" v-model="name" placeholder="이름 입력" required />
+        <label for="realname">이름</label>
+        <input type="text" id="realname" v-model="realname" placeholder="이름 입력" required />
       </div>
 
       <!-- 닉네임 -->
       <div class="form-group">
         <label for="nickname">닉네임</label>
-        <input type="text" id="nickname" v-model="nickname" placeholder="닉네임 입력" required />
+        <div class="email-input-wrapper">
+          <input type="text" id="nickname" v-model="nickname" placeholder="닉네임 입력" required />
+          <button type="button" @click="checkNicknameDuplicate">중복 확인</button>
+        </div>
+        <span v-if="nicknameErrorMessage" style="color: red;">{{ nicknameErrorMessage }}</span>
       </div>
 
       <!-- 생년월일 -->
@@ -101,40 +108,47 @@
         <label>성별</label>
         <div class="gender">
           <label>
-            <input type="radio" value="남" v-model="gender" required /> 남
+            <input type="radio" value="MALE" v-model="gender" required />
+            남성
           </label>
           <label>
-            <input type="radio" value="여" v-model="gender" required /> 여
+            <input type="radio" value="FEMALE" v-model="gender" required />
+            여성
           </label>
         </div>
       </div>
 
       <!-- 선호 장르 -->
       <div class="form-group">
-        <label>선호 장르</label>
+        <label>선호 장르(최소 1개 선택)</label>
         <div class="genre-select">
-          <label for="genre1">[장르 1]</label>
+          <label for="genre1">-장르 1-</label>
           <select v-model="selectedGenre1" id="genre1" required>
-            <option value="" disabled selected>선택</option>
-            <option v-for="genre in allGenres" :key="genre" :value="genre">{{ genre }}</option>
+            <option value="" disabled>선택</option>
+            <option v-for="genre in allGenres" :key="genre.value" :value="genre.value">
+              {{ genre.label }}
+            </option>
           </select>
         </div>
         <div class="genre-select">
-          <label for="genre2">[장르 2]</label>
+          <label for="genre2">-장르 2-</label>
           <select v-model="selectedGenre2" id="genre2">
-            <option value="" disabled selected>선택</option>
-            <option v-for="genre in allGenres" :key="genre" :value="genre">{{ genre }}</option>
+            <option value="" disabled>선택</option>
+            <option v-for="genre in allGenres" :key="genre.value" :value="genre.value">
+              {{ genre.label }}
+            </option>
           </select>
         </div>
         <div class="genre-select">
-          <label for="genre3">[장르 3]</label>
+          <label for="genre3">-장르 3-</label>
           <select v-model="selectedGenre3" id="genre3">
-            <option value="" disabled selected>선택</option>
-            <option v-for="genre in allGenres" :key="genre" :value="genre">{{ genre }}</option>
+            <option value="" disabled>선택</option>
+            <option v-for="genre in allGenres" :key="genre.value" :value="genre.value">
+              {{ genre.label }}
+            </option>
           </select>
         </div>
       </div>
-
       <button type="submit" class="signup-button">회원가입하기</button>
     </form>
   </div>
@@ -142,6 +156,8 @@
 
 <script>
 import axios from "axios"; // axios import 추가
+
+axios.defaults.baseURL = 'http://localhost:8081'; // Spring Boot 서버 주소
 
 export default {
   name: "SignupView",
@@ -153,39 +169,49 @@ export default {
       passwordConfirm: "",
       passwordVisible: false,
       passwordConfirmVisible: false,
-      name: "",
+      realname: "",
       nickname: "",
       birthdate: "",
       gender: "",
+      allGenres: [
+      { label: "판타지", value: "FANTASY" },
+      { label: "과학 소설", value: "SCIENCE_FICTION" },
+      { label: "미스터리", value: "MYSTERY" },
+      ],
       selectedGenre1: "",
       selectedGenre2: "",
-      selectedGenre3: "",
-      allGenres: [
-        "도서관, 서지학", "문헌정보학", "백과사전", "강연집, 수필집, 연설문집",
-        "일반 연속간행물", "일반학회, 단체, 협회, 기관", "신문, 언론, 저널리즘", "일반전집, 총서", "향토자료",
-      ],
+      selectedGenre3: "", 
+      
       emailErrorMessage: "",
       verificationErrorMessage: "",
       isVerificationCodeSent: false,
     };
   },
+
+  computed: {
+    isPasswordMismatch() {
+      return this.passwordConfirm && this.password !== this.passwordConfirm;
+    },
+  },
+
   methods: {
     goBack() {
       this.$router.push("/login");
     },
     
     async checkEmailDuplicate() {
-      try {
-        const response = await axios.post("/api/user/register", { email: this.email });
-        if (response.data.isDuplicate) {
-          this.emailErrorMessage = "이미 사용된 이메일입니다.";
+    try {
+        const response = await axios.get(`/api/user/check-email?email=${encodeURIComponent(this.email)}`);
+        if (response.data.success) {
+            this.emailErrorMessage = "사용 가능한 이메일입니다.";
         } else {
-          this.emailErrorMessage = "";
+            /* this.emailErrorMessage = response.data.message; // ApiResponse에서 메시지 가져오기 */
+            this.emailErrorMessage = "중복된 이메일입니다.";
         }
-      } catch (error) {
+    } catch (error) {
         console.error("이메일 중복 확인 오류:", error);
-      }
-    },
+    }
+},
 
     async sendVerificationCode() {
       if (!this.email) {
@@ -193,8 +219,8 @@ export default {
         return;
       }
       try {
-        const response = await axios.post("/api/user/register", { email: this.email });
-        if (response.data.success) {
+        const response = await axios.post("/api/email/send-verification", { email: this.email });
+        if (response.data.isSuccess) {
           alert("인증번호가 이메일로 전송되었습니다.");
           this.isVerificationCodeSent = true;
         } else {
@@ -205,53 +231,121 @@ export default {
       }
     },
 
-    async verifyCode() {
-      if (!this.verificationCode) {
+   async verifyCode() {
+    if (!this.verificationCode) {
         alert("인증번호를 입력해주세요.");
         return;
-      }
-      try {
-        const response = await axios.post("/api/user/register", {
-          email: this.email,
-          verificationCode: this.verificationCode,
-        });
-        if (response.data.isValid) {
-          this.verificationErrorMessage = "";
-          alert("인증 성공");
+    }
+    try {
+        const response = await axios.get(`/api/email/verify-code?inputCode=${this.verificationCode}`);
+        if (response.data.isSuccess) {
+            alert("인증번호가 확인되었습니다.");
+            // 이후 회원가입 진행 또는 다음 단계로 이동
         } else {
-          this.verificationErrorMessage = "인증번호가 올바르지 않습니다.";
+            alert("인증번호 확인에 실패했습니다: " + response.data.message);
         }
-      } catch (error) {
-        console.error("인증번호 확인 오류:", error);
-      }
-    },
+    } catch (error) {
+        console.error("인증번호 검증 오류:", error);
+    }
+  },
 
-    async handleSignup() {
-      if (this.password !== this.passwordConfirm) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
+  async checkNicknameDuplicate() {
+    try {
+      const response = await axios.get(`/api/user/check-nickname?nickname=${encodeURIComponent(this.nickname)}`);
+      if (response.data.success) {
+        this.nicknameErrorMessage = "사용 가능한 닉네임입니다.";
+      } else {
+        this.nicknameErrorMessage = "중복된 닉네임입니다."; // API 메시지 사용
       }
-      const signupData = {
-        email: this.email,
-        password: this.password,
-        name: this.name,
-        nickname: this.nickname,
-        birthdate: this.birthdate,
-        gender: this.gender,
-        genres: [this.selectedGenre1, this.selectedGenre2, this.selectedGenre3],
-      };
-      console.log("회원가입 데이터:", signupData);
-      try {
-        const response = await axios.post("/api/user/register", signupData);
-        if (response.data.success) {
-          alert("회원가입 성공!");
-        } else {
-          alert("회원가입 실패.");
-        }
-      } catch (error) {
-        console.error("회원가입 오류:", error);
-      }
-    },
+    } catch (error) {
+      console.error("닉네임 중복 확인 오류:", error);
+    }
+  },
+
+  async handleSignup() {
+  // 입력값 유효성 검증
+  if (!this.email) {
+    alert("이메일을 입력해주세요.");
+    return;
+  }
+
+  if (this.emailErrorMessage !== "사용 가능한 이메일입니다.") {
+    alert("이메일 중복 확인을 해주세요.");
+    return;
+  }
+
+  if (!this.isVerificationCodeSent || !this.verificationCode) {
+    alert("인증번호를 입력하고 인증을 완료해주세요.");
+    return;
+  }
+
+  if (!this.password || !this.passwordConfirm) {
+    alert("비밀번호를 입력해주세요.");
+    return;
+  }
+
+  if (this.password !== this.passwordConfirm) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return;
+  }
+
+  if (!this.realname) {
+    alert("이름을 입력해주세요.");
+    return;
+  }
+
+  if (!this.nickname) {
+    alert("닉네임을 입력해주세요.");
+    return;
+  }
+
+  if (this.nicknameErrorMessage !== "사용 가능한 닉네임입니다.") {
+    alert("닉네임 중복 확인을 해주세요.");
+    return;
+  }
+
+  if (!this.birthdate) {
+    alert("생년월일을 입력해주세요.");
+    return;
+  }
+
+  if (!this.gender) {
+    alert("성별을 선택해주세요.");
+    return;
+  }
+
+  if (!this.selectedGenre1) {
+    alert("최소 한 개의 장르를 선택해주세요.");
+    return;
+  }
+
+  // 회원가입 요청 데이터
+  const signupData = {
+    email: this.email,
+    password: this.password,
+    passwordConfirm: this.passwordConfirm,
+    realname: this.realname,
+    nickname: this.nickname,
+    birthDate: this.birthdate,
+    gender: this.gender,
+    genre: [this.selectedGenre1, this.selectedGenre2, this.selectedGenre3].filter((g) => g),
+  };
+
+  // 서버 데이터 전송
+  try {
+    const response = await axios.post("/api/user/register", signupData);
+    if (response.data.success) {
+      alert("회원가입 성공!");
+      this.$router.push("/login"); // 성공 시 로그인 페이지로 이동
+    } else {
+      alert("회원가입 실패: " + response.data.message);
+    }
+  } catch (error) {
+    console.error("회원가입 오류:", error.response ? error.response.data : error.message);
+    alert("회원가입 오류: " + (error.response ? error.response.data.message : "알 수 없는 오류입니다."));
+  }
+},
+
 
     togglePasswordVisibility(field) {
       if (field === "password") {
@@ -344,16 +438,18 @@ select {
   box-sizing: border-box;
 }
 
-/* 성별 체크박스 */
+/* 성별 체크박스 스타일 수정 */
 .gender {
-  display: flex;
-  justify-content: space-around;
+  display: flex; /* 가로 배치 */
+  gap: 100px; /* 항목 간 간격 */
 }
 
 .gender label {
-  display: flex;
-  align-items: center;
-  gap: 7px; /* 텍스트와 체크박스 간격 */
+  display: inline-flex; /* 라디오 버튼과 텍스트를 가로로 배치 */
+  align-items: center; /* 수직 정렬 */
+  gap: 5px; /* 라디오 버튼과 텍스트 간 간격 */
+  margin: 0; /* 기본 마진 제거 */
+  font-size: 10pt;
 }
 
 .signup-button {
@@ -370,5 +466,10 @@ select {
 
 .signup-button:hover {
   background: #218838;
+}
+
+.input-error {
+  border: 2px solid red; /* 테두리를 빨간색으로 변경 */
+  background-color: #ffe6e6; /* 옅은 빨간색 배경 */
 }
 </style>
