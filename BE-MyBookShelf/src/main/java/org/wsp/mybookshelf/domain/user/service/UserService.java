@@ -47,6 +47,7 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+
     @Transactional
     public UserResponseDTO loginUser(UserRequestDTO.LoginRequestDTO requestDTO) {
         // 이메일로 사용자 조회
