@@ -44,8 +44,6 @@ public class UserController {
             userService.isEmailDuplicate(requestDTO.getEmail());
             userService.isNickNameDuplicate(requestDTO.getNickname());
 
-
-
             // 사용자 등록
             User savedUser = userService.registerUser(requestDTO);
 
