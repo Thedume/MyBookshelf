@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+package org.wsp.mybookshelf.global.commonEntity.enums;
+
+public enum Status {
+}
+=======
 package org.wsp.mybookshelf.global.commonEntity.enums;
 
 import lombok.Getter;
@@ -14,3 +20,4 @@ public enum Status {
         this.description = description;
     }
 }
+>>>>>>> ef4d9322cabfa11199b9fee8d65e5f14f3839b59
