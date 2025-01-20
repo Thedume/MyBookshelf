@@ -71,7 +71,7 @@ public class UserRequestDTO {
         private String password;
 
         @NotBlank(message = "비밀번호를 다시 한번 입력해주세요")
-        private String repassword;
+        private String passwordConfirm;
 
         @NotNull(message = "생년월일은 필수입니다.")
         private LocalDate birthDate;
@@ -79,7 +79,9 @@ public class UserRequestDTO {
         @NotNull(message = "성별은 필수입니다.")
         private Gender gender;
 
+
         @NotNull(message = "선호 장르는 필수입니다.")
         private List<Genre> genre; // 여러 장르를 받을 수 있도록 리스트로 변경
+
     }
 }

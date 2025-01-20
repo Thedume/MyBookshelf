@@ -27,7 +27,7 @@ public class UserController {
         try {
 
             // 비밀번호 일치 여부 확인
-            if (!requestDTO.getPassword().equals(requestDTO.getRepassword())) {
+            if (!requestDTO.getPassword().equals(requestDTO.getPasswordConfirm())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(ApiResponse.onFailure("400", "비밀번호가 일치하지 않습니다."));
             }

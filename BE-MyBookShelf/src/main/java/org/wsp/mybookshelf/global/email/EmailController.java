@@ -28,10 +28,10 @@ public class EmailController {
 
             // 세션에 인증번호와 이메일 저장
             session.setAttribute("verificationCode", verificationCode);
-            session.setAttribute("userEmail", emailRequest.getTo());
+            session.setAttribute("userEmail", emailRequest.getEmail());
 
             // 인증 이메일 발송
-            emailService.sendVerificationCode(emailRequest.getTo(), verificationCode);
+            emailService.sendVerificationCode(emailRequest.getEmail(), verificationCode);
 
             return ResponseEntity.ok(ApiResponse.onSuccess("인증번호가 이메일로 발송되었습니다."));
         } catch (Exception e) {
@@ -51,6 +51,11 @@ public class EmailController {
 
         // 세션에서 인증번호 가져오기
         Integer sessionCode = (Integer) session.getAttribute("verificationCode");
+
+        // 세션 상태 로깅
+        System.out.println("세션 상태: " + session); // 세션 정보 출력
+        System.out.println("저장된 인증번호: " + sessionCode); // 인증번호 출력
+
 
         // 세션이 초기화된 경우
         if (sessionCode == null) {
