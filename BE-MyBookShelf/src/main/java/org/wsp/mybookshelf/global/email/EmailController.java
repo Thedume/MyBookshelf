@@ -30,6 +30,10 @@ public class EmailController {
             session.setAttribute("verificationCode", verificationCode);
             session.setAttribute("userEmail", emailRequest.getEmail());
 
+            System.out.println("인증번호 전송 : " + verificationCode);
+            System.out.println("인증번호전송 - 세션 인증번호 : " + session.getAttribute("verificationCode"));
+
+
             // 인증 이메일 발송
             emailService.sendVerificationCode(emailRequest.getEmail(), verificationCode);
 
@@ -48,6 +52,7 @@ public class EmailController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.onFailure("400", "인증번호를 입력하지 않았습니다."));
         }
+        System.out.println("입력 인증번호: " + inputCode);
 
         // 세션에서 인증번호 가져오기
         Integer sessionCode = (Integer) session.getAttribute("verificationCode");

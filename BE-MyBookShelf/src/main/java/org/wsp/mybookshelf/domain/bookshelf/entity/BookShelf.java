@@ -19,6 +19,9 @@ public class BookShelf {
     @Column(name = "bookshelf_id", nullable = false)
     private String bookshelfId;
 
+    @Column(name = "bookshelf_name", nullable = false)
+    private String bookshelfName;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
