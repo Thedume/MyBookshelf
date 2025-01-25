@@ -51,7 +51,7 @@ public class UserController {
             UserResponseDTO responseDTO = UserResponseDTO.builder()
                     .id(savedUser.getUserId())
                     .email(savedUser.getEmail())
-                    .realname(savedUser.getRealName()) // realName으로 수정
+                    .realname(savedUser.getRealName())
                     .nickname(savedUser.getNickName())
                     .build();
 
@@ -79,6 +79,7 @@ public class UserController {
         System.out.println("Received login request: " + requestDTO);
         try {
             UserResponseDTO userResponse = userService.loginUser(requestDTO);
+            System.out.println("로그인");
 
             // 세션에 사용자 정보 저장
             HttpSession session = request.getSession();

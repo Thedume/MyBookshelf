@@ -1,9 +1,6 @@
 package org.wsp.mybookshelf.domain.book.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -18,8 +15,9 @@ import java.util.Date;
 public class Book {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 생성 전략 설정
     @Column(name = "book_id", nullable = false)
-    private String bookId;
+    private Long bookId;
 
     @Column(name = "title")
     private String title;
